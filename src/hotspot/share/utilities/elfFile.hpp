@@ -29,6 +29,8 @@
 
 #if defined(__OpenBSD__)
 #include <sys/exec_elf.h>
+#elif defined(__QNX__)
+#include <sys/elf.h>
 #else
 #include <elf.h>
 #endif
@@ -72,6 +74,12 @@ typedef Elf32_Sym       Elf_Sym;
 #include "memory/allocation.hpp"
 #include "utilities/checkedCast.hpp"
 #include "utilities/decoder.hpp"
+
+#if defined(LINUX) || defined(__QNX__)
+#define NOT_NOEXECSTACK(code)
+#else
+#define NOT_NOEXECSTACK(code) code
+#endif
 
 #ifdef ASSERT
 // Helper macros to print different log levels during DWARF parsing
@@ -197,7 +205,7 @@ class ElfFile: public CHeapObj<mtInternal> {
   // Returns false if the elf file requires an executable stack, the stack flag
   // is not set at all, or if the file can not be read.
   // On systems other than linux it always returns false.
-  static bool specifies_noexecstack(const char* filepath) NOT_LINUX({ return false; });
+  static bool specifies_noexecstack(const char* filepath) NOT_NOEXECSTACK({ return false; });
 
   bool get_source_info(uint32_t offset_in_library, char* filename, size_t filename_len, int* line, bool is_pc_after_call);
 

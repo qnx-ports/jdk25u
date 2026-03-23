@@ -212,16 +212,26 @@ public:
     ASSERT_TRUE(result);
 
     result = os::committed_in_range((address)base, size, committed_start, committed_size);
+
+#ifdef __QNX__
+    // For qnx the result is true so long as the page is mapped
+    ASSERT_TRUE(result);
+#else
     ASSERT_FALSE(result);
 
     // Touch pages
     for (index = 0; index < pages_to_touch; index ++) {
       base[index * page_sz] = 'a';
     }
+#endif
 
     result = os::committed_in_range((address)base, size, committed_start, committed_size);
     ASSERT_TRUE(result);
+#ifdef __QNX__
+    ASSERT_EQ(num_pages * page_sz, committed_size);
+#else
     ASSERT_EQ(pages_to_touch * page_sz, committed_size);
+#endif
     ASSERT_EQ(committed_start, (address)base);
 
     os::uncommit_memory(base, size, false);

@@ -123,5 +123,9 @@ typedef char            SBYTE;
 #define INLINE          inline
 #endif
 
+#if X_PLATFORM == X_QNX
+#define INLINE          inline
+#endif
+
 
 #endif  // __SOUNDDEFS_INCLUDED__

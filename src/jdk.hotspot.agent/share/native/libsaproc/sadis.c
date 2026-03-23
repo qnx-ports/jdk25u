@@ -46,7 +46,11 @@
 #include <dlfcn.h>
 
 #ifndef __APPLE__
+#ifdef __QNX__
+#include <sys/link.h>
+#else
 #include <link.h>
+#endif
 #endif
 
 #endif

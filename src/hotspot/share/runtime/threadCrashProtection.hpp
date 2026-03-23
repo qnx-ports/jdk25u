@@ -27,7 +27,7 @@
 #define SHARE_RUNTIME_THREADCRASHPROTECTION_HPP
 
 #include "memory/allocation.hpp"
-#if defined(LINUX) || defined(AIX) || defined(BSD)
+#if defined(LINUX) || defined(AIX) || defined(BSD) || defined(__QNX__)
 # include "threadCrashProtection_posix.hpp"
 #else
 # include OS_HEADER(threadCrashProtection)

@@ -295,7 +295,7 @@ static DIR *open_directory_secure(const char* dirname) {
   // calling opendir() and is_directory_secure() does.
   int result;
   DIR *dirp = nullptr;
-  RESTARTABLE(::open(dirname, O_RDONLY|O_NOFOLLOW), result);
+  RESTARTABLE(::open(dirname, O_RDONLY|O_NOFOLLOW|O_DIRECTORY), result);
   if (result == OS_ERR) {
     // Directory doesn't exist or is a symlink, so there is nothing to cleanup.
     if (PrintMiscellaneous && Verbose) {
@@ -361,7 +361,7 @@ static DIR *open_directory_secure_cwd(const char* dirname, int *saved_cwd_fd) {
 
   // Open a fd to the cwd and save it off.
   int result;
-  RESTARTABLE(::open(".", O_RDONLY), result);
+  RESTARTABLE(::open(".", O_RDONLY|O_DIRECTORY), result);
   if (result == OS_ERR) {
     *saved_cwd_fd = -1;
   } else {

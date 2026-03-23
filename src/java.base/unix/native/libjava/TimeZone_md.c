@@ -45,18 +45,18 @@
 #define filegets        fgets
 #define fileclose       fclose
 
-#if defined(__linux__) || defined(_ALLBSD_SOURCE)
+#if defined(__linux__) || defined(_ALLBSD_SOURCE) || defined(__QNX__)
 static const char *ZONEINFO_DIR = "/usr/share/zoneinfo";
 static const char *DEFAULT_ZONEINFO_FILE = "/etc/localtime";
 #else
 static const char *SYS_INIT_FILE = "/etc/default/init";
 static const char *ZONEINFO_DIR = "/usr/share/lib/zoneinfo";
 static const char *DEFAULT_ZONEINFO_FILE = "/usr/share/lib/zoneinfo/localtime";
-#endif /* defined(__linux__) || defined(_ALLBSD_SOURCE) */
+#endif /* defined(__linux__) || defined(_ALLBSD_SOURCE) || defined(__QNX__) */
 
 static const char popularZones[][4] = {"UTC", "GMT"};
 
-#if defined(__linux__) || defined(MACOSX)
+#if defined(__linux__) || defined(MACOSX) || defined(__QNX__)
 static char *isFileIdentical(char* buf, size_t size, char *pathname);
 
 /*

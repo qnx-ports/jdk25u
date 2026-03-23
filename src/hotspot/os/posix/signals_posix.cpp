@@ -50,6 +50,9 @@
 #include <signal.h>
 
 #define SEGV_BNDERR_value 3
+#ifdef __QNX__
+#define SA_RESTART 0
+#endif
 
 #if defined(SEGV_BNDERR)
 STATIC_ASSERT(SEGV_BNDERR == SEGV_BNDERR_value);
@@ -548,6 +551,8 @@ void PosixSignals::unblock_error_signals() {
 #define JVM_HANDLE_XXX_SIGNAL JVM_handle_aix_signal
 #elif defined(LINUX)
 #define JVM_HANDLE_XXX_SIGNAL JVM_handle_linux_signal
+#elif defined(__QNX__)
+#define JVM_HANDLE_XXX_SIGNAL JVM_handle_qnx_signal
 #else
 #error who are you?
 #endif
@@ -994,12 +999,14 @@ static bool get_signal_code_description(const siginfo_t* si, enum_sigcode_desc_t
     { SIGCHLD, CLD_TRAPPED,  "CLD_TRAPPED",  "Traced child has trapped." },
     { SIGCHLD, CLD_STOPPED,  "CLD_STOPPED",  "Child has stopped." },
     { SIGCHLD, CLD_CONTINUED,"CLD_CONTINUED","Stopped child has continued." },
+#ifndef __QNX__
 #ifdef SIGPOLL
     { SIGPOLL, POLL_OUT,     "POLL_OUT",     "Output buffers available." },
     { SIGPOLL, POLL_MSG,     "POLL_MSG",     "Input message available." },
     { SIGPOLL, POLL_ERR,     "POLL_ERR",     "I/O error." },
     { SIGPOLL, POLL_PRI,     "POLL_PRI",     "High priority input available." },
     { SIGPOLL, POLL_HUP,     "POLL_HUP",     "Device disconnected. [Option End]" },
+#endif
 #endif
     { -1, -1, nullptr, nullptr }
   };
@@ -1192,6 +1199,7 @@ void os::print_siginfo(outputStream* os, const void* si0) {
   } else if (sig == SIGSEGV || sig == SIGBUS || sig == SIGILL ||
              sig == SIGTRAP || sig == SIGFPE) {
     os->print(", si_addr: " PTR_FORMAT, p2i(si->si_addr));
+#ifndef __QNX__
 #ifdef SIGPOLL
   } else if (sig == SIGPOLL) {
     // siginfo_t.si_band is defined as "long", and it is so in most
@@ -1199,6 +1207,7 @@ void os::print_siginfo(outputStream* os, const void* si0) {
     // Cast si_band to "long" to prevent format specifier mismatch.
     // See: https://sourceware.org/bugzilla/show_bug.cgi?id=23821
     os->print(", si_band: %ld", (long) si->si_band);
+#endif
 #endif
   }
 }

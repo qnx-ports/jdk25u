@@ -37,7 +37,7 @@
 #include <strings.h>
 #endif
 
-#if defined(_ALLBSD_SOURCE)
+#if defined(_ALLBSD_SOURCE) || defined(__QNX__)
 #include <net/ethernet.h>
 #include <net/if_dl.h>
 #include <ifaddrs.h>
@@ -1659,7 +1659,7 @@ static int getFlags(int sock, const char *ifname, int *flags) {
 #endif /* _AIX */
 
 /** BSD **/
-#if defined(_ALLBSD_SOURCE)
+#if defined(_ALLBSD_SOURCE) || defined(__QNX__)
 
 /*
  * Opens a socket for further ioctl calls. Tries AF_INET socket first and
@@ -1773,7 +1773,7 @@ static netif *enumIPv6Interfaces(JNIEnv *env, int sock, netif *ifs) {
  * Try to get the interface index.
  */
 static int getIndex(int sock, const char *name) {
-#if !defined(__FreeBSD__)
+#if !defined(__FreeBSD__) || defined(__QNX__)
     int index = if_nametoindex(name);
     return (index == 0) ? -1 : index;
 #else

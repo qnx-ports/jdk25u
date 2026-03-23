@@ -24,10 +24,18 @@
 #include <stdio.h>
 #include <jni.h>
 #include <signal.h>
+#ifdef __QNX__
+#include <ucontext.h>
+#else
 #include <sys/ucontext.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef SA_RESTART
+#define SA_RESTART 0
 #endif
 
 void sig_handler(int sig, siginfo_t *info, ucontext_t *context) {

@@ -34,7 +34,7 @@
 #include <sys/param.h>
 #include <sys/mount.h>
 #else
-#include <sys/statfs.h>
+#include <sys/statvfs.h>
 #endif
 #endif
 
@@ -142,8 +142,8 @@ Java_GetXSpace_getSpace0
     chars[len] = '\0';
     (*env)->ReleaseStringChars(env, root, strchars);
 
-    struct statfs buf;
-    int result = statfs(chars, &buf);
+    struct statvfs buf;
+    int result = statvfs(chars, &buf);
     free(chars);
     if (result < 0) {
         JNU_ThrowByNameWithLastError(env, "java/lang/RuntimeException",

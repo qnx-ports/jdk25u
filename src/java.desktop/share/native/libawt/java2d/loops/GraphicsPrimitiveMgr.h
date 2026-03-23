@@ -31,6 +31,10 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#ifdef __QNX__
+#include <stdint.h>
+#endif
+
 #include "jni.h"
 
 #include "java_awt_AlphaComposite.h"

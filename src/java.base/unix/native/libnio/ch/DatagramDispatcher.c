@@ -37,6 +37,12 @@
 #include "nio_util.h"
 #include "sun_nio_ch_DatagramDispatcher.h"
 
+#ifdef __QNX__
+#ifndef IOV_MAX
+#define IOV_MAX    1024
+#endif
+#endif
+
 JNIEXPORT jint JNICALL
 Java_sun_nio_ch_DatagramDispatcher_read0(JNIEnv *env, jclass clazz,
                                          jobject fdo, jlong address, jint len)

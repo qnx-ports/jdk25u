@@ -29,7 +29,11 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
+#ifdef __QNX__
+#include <ucontext.h>
+#else
 #include <sys/ucontext.h>
+#endif
 #include <string.h>
 
 extern "C" {

@@ -87,6 +87,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBNIO, \
         -framework CoreFoundation \
         -framework CoreServices, \
     LIBS_windows := advapi32.lib mswsock.lib ws2_32.lib, \
+    LIBS_qnx := -lepoll -leventfd, \
 ))
 
 TARGETS += $(BUILD_LIBNIO)

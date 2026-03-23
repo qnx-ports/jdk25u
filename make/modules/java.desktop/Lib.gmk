@@ -47,8 +47,8 @@ ifeq ($(call isTargetOs, aix), false)
       -DX_PLATFORM=X_$(OPENJDK_TARGET_OS_UPPERCASE) \
       -DUSE_PORTS=TRUE \
       -DUSE_DAUDIO=TRUE \
-      -DUSE_PLATFORM_MIDI_OUT=TRUE \
-      -DUSE_PLATFORM_MIDI_IN=TRUE \
+      -DUSE_PLATFORM_MIDI_OUT=FALSE \
+      -DUSE_PLATFORM_MIDI_IN=FALSE \
       #
 
   LIBJSOUND_LINK_TYPE := C
@@ -69,6 +69,7 @@ ifeq ($(call isTargetOs, aix), false)
           unused-but-set-variable, \
       DISABLED_WARNINGS_clang_DirectAudioDevice.c := unused-function, \
       LIBS_linux := $(ALSA_LIBS), \
+      LIBS_qnx := $(ALSA_LIBS), \
       LIBS_macosx := \
           -framework AudioToolbox \
           -framework AudioUnit \

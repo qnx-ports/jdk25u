@@ -415,6 +415,14 @@
 #define NOT_AIX(code) code
 #endif
 
+#ifdef __QNX__
+#define QNX_ONLY(code) code
+#define NOT_QNX(code)
+#else
+#define QNX_ONLY(code)
+#define NOT_QNX(code) code
+#endif
+
 #ifdef _WINDOWS
 #define WINDOWS_ONLY(code) code
 #define NOT_WINDOWS(code)

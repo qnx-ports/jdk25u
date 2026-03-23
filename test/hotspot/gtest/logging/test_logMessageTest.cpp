@@ -50,8 +50,10 @@ const char* LogMessageTest::_level_filename[] = {
 LogMessageTest::LogMessageTest() {
   for (int i = 0; i < LogLevel::Count; i++) {
     char buf[32];
-    // Attempt to remove possibly pre-existing log files
-    remove(_level_filename[i]);
+    if (_level_filename[i] != nullptr){
+    	// Attempt to remove possibly pre-existing log files
+    	remove(_level_filename[i]);
+    }
 
     jio_snprintf(buf, sizeof(buf), "logging=%s", LogLevel::name(static_cast<LogLevelType>(i)));
     set_log_config(_level_filename[i], buf);
@@ -62,7 +64,9 @@ LogMessageTest::~LogMessageTest() {
   // Stop logging to the files and remove them.
   for (int i = 0; i < LogLevel::Count; i++) {
     set_log_config(_level_filename[i], "all=off");
-    remove(_level_filename[i]);
+    if (_level_filename[i] != nullptr){
+        remove(_level_filename[i]);
+    }
   }
 }
 

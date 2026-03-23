@@ -63,6 +63,9 @@
 #ifdef LINUX
 #include "os_linux.hpp"
 #endif
+#ifdef QNX
+#include "os_qnx.hpp"
+#endif
 
 #include <dirent.h>
 #include <dlfcn.h>
@@ -83,7 +86,11 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef __QNX__
+#include <utmp.h>
+#else
 #include <utmpx.h>
+#endif
 
 #ifdef __APPLE__
   #include <crt_externs.h>
@@ -96,7 +103,7 @@
 #endif
 
 /* Input/Output types for mincore(2) */
-typedef LINUX_ONLY(unsigned) char mincore_vec_t;
+typedef LINUX_ONLY(unsigned) QNX_ONLY(unsigned) char mincore_vec_t;
 
 static jlong initial_time_count = 0;
 
@@ -148,7 +155,7 @@ void os::check_core_dump_prerequisites(char* buffer, size_t bufferSize, bool che
 
 bool os::committed_in_range(address start, size_t size, address& committed_start, size_t& committed_size) {
 
-#ifdef _AIX
+#if defined(_AIX)
   committed_start = start;
   committed_size = size;
   return true;
@@ -376,7 +383,7 @@ bool os::dir_is_empty(const char* path) {
 
 static char* reserve_mmapped_memory(size_t bytes, char* requested_addr, MemTag mem_tag) {
   char * addr;
-  int flags = MAP_PRIVATE NOT_AIX( | MAP_NORESERVE ) | MAP_ANONYMOUS;
+  int flags = MAP_PRIVATE NOT_QNX(NOT_AIX( | MAP_NORESERVE )) | MAP_ANONYMOUS;
   if (requested_addr != nullptr) {
     assert((uintptr_t)requested_addr % os::vm_page_size() == 0, "Requested address should be aligned to OS page size");
     flags |= MAP_FIXED;
@@ -543,6 +550,35 @@ void os::Posix::print_load_average(outputStream* st) {
   st->cr();
 }
 
+#ifdef __QNX__
+// QNX doesnt seem to hae utmpx so use utmp
+void os::Posix::print_uptime_info(outputStream* st) {
+  int bootsec = -1;
+  time_t currsec = time(nullptr);
+  struct utmp* ent;
+  
+  // Rewind to the beginning of the utmp file
+  setutent(); 
+  
+  while ((ent = getutent())) {
+    // BOOT_TIME is the standard way to identify the system boot record
+    if (ent->ut_type == BOOT_TIME) {
+      // In utmp, the time is typically in ut_time or ut_tv.tv_sec 
+      // depending on the platform's glibc version.
+      bootsec = (int)ent->ut_time; 
+      break;
+    }
+  }
+  
+  // Close the utmp file
+  endutent();
+
+  if (bootsec != -1) {
+    os::print_dhm(st, "OS uptime:", currsec - bootsec);
+  }
+}
+
+#else
 // boot/uptime information;
 // unfortunately it does not work on macOS and Linux because the utx chain has no entry
 // for reboot at least on my test machines
@@ -562,6 +598,8 @@ void os::Posix::print_uptime_info(outputStream* st) {
     os::print_dhm(st, "OS uptime:", currsec-bootsec);
   }
 }
+#endif
+
 
 static void print_rlimit(outputStream* st, const char* msg,
                          int resource, bool output_k = false) {

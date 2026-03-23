@@ -96,7 +96,7 @@ ifneq ($(SKIP_SPEC), true)
   # with multiple specs, we should find the intersection of targets provided
   # by all specs, but we approximate this by an arbitrary spec from the list.
   # This will setup ALL_MAIN_TARGETS.
-  $(eval $(call DefineMainTargets, FORCE, $(firstword $(SPECS))))
+  $(eval $(call DefineMainTargets, LAZY, $(firstword $(SPECS))))
 
   # Separate called targets depending on type.
   INIT_TARGETS := $(filter $(ALL_INIT_TARGETS), $(CALLED_SPEC_TARGETS))

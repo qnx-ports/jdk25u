@@ -226,6 +226,10 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_OS],
       VAR_OS=aix
       VAR_OS_TYPE=unix
       ;;
+    *qnx*|*nto*)
+      VAR_OS=qnx
+      VAR_OS_TYPE=unix
+      ;;
     *)
       AC_MSG_ERROR([unsupported operating system $1])
       ;;

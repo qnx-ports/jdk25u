@@ -38,6 +38,8 @@ AC_DEFUN([BPERF_CHECK_CORES],
     NUM_CORES=`/usr/sbin/sysctl -n hw.ncpu`
   elif test "x$OPENJDK_BUILD_OS" = xaix ; then
     NUM_CORES=`lparstat -m 2> /dev/null | $GREP -o "lcpu=[[0-9]]*" | $CUT -d "=" -f 2`
+  elif test "x$OPENJDK_BUILD_OS" = xqnx ; then
+    NUM_CORES=`pidin syspage=cpuinfo | grep -c cpu:`
   elif test -n "$NUMBER_OF_PROCESSORS"; then
     # On windows, look in the env
     NUM_CORES=$NUMBER_OF_PROCESSORS
@@ -77,6 +79,12 @@ AC_DEFUN([BPERF_CHECK_MEMORY_SIZE],
     # Windows, but without cygwin
     MEMORY_SIZE=`powershell -Command \
         "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory" | $SED 's/\\r//g' `
+    MEMORY_SIZE=`expr $MEMORY_SIZE / 1024 / 1024`
+    FOUND_MEM=yes
+  elif test "x$OPENJDK_BUILD_OS" = xqnx; then
+    QNX_PAGE_SIZE=`pidin syspage=system_private | grep pagesize | awk '{split([$]0,a," "); split(a[[1]], b, ":") ;print "0x" b[[2]]}' | xargs printf "%d"`
+    QNX_PAGES_AVAIL=`cat /proc/vm/stats | grep vmem_avail | awk '{split([$]0,a," "); split(a[[1]],b,"="); printf b[[2]]}' | xargs printf "%d"`
+    MEMORY_SIZE=`expr $QNX_PAGE_SIZE "*" $QNX_PAGES_AVAIL`
     MEMORY_SIZE=`expr $MEMORY_SIZE / 1024 / 1024`
     FOUND_MEM=yes
   fi

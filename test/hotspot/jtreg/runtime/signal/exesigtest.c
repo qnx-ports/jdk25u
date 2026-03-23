@@ -240,6 +240,7 @@ void setSignalHandler()
            exit(TEST_FAILED);
         }
     } // end - dealing with sigaction
+#ifndef __QNX__
     else if (!strcmp(mode, "sigset"))
     {
 #ifdef __GNUC__
@@ -251,6 +252,7 @@ void setSignalHandler()
 #pragma GCC diagnostic pop
 #endif
     } // end dealing with sigset
+#endif
     printf("%s: signal handler using function '%s' has been set\n", signal_name, mode);
 }
 

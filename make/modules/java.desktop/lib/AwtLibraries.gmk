@@ -61,7 +61,7 @@ ifeq ($(call isTargetOs, windows), true)
       #
 endif
 
-ifeq ($(call isTargetOs, linux macosx aix), true)
+ifeq ($(call isTargetOs, linux macosx aix qnx), true)
   LIBAWT_EXCLUDE_FILES += awt_Font.c CUPSfuncs.c fontpath.c X11Color.c
 endif
 
@@ -205,6 +205,7 @@ ifeq ($(call isTargetOs, windows macosx), false)
       DISABLED_WARNINGS_clang_X11SurfaceData.c := unused-function, \
       JDK_LIBS := libawt java.base:libjava, \
       LIBS_linux := $(LIBDL) $(LIBM), \
+      LIBS_qnx := $(LIBM), \
       STATIC_LIB_EXCLUDE_OBJS := $(LIBAWT_HEADLESS_STATIC_EXCLUDE_OBJS), \
   ))
 
@@ -235,7 +236,7 @@ ifeq ($(call isTargetOs, windows macosx)+$(ENABLE_HEADLESS_ONLY), false+false)
       #
 
   # exclude pipewire from the AIX build, no Wayland support
-  ifeq ($(call isTargetOs, aix), false)
+  ifeq ($(call isTargetOs, aix qnx), false)
     LIBAWT_XAWT_EXTRA_HEADER_DIRS += libpipewire/include
   endif
 
@@ -300,6 +301,8 @@ ifeq ($(call isTargetOs, windows macosx)+$(ENABLE_HEADLESS_ONLY), false+false)
       LIBS_unix := $(LIBDL) $(LIBM) $(X_LIBS) -lX11 -lXext -lXi -lXrender \
           -lXtst, \
       LIBS_linux := $(LIBPTHREAD), \
+      LIBS_bsd := $(LIBPTHREAD), \
+      LIBS_qnx := -lsysv-ipc, \
       STATIC_LIB_EXCLUDE_OBJS := $(LIBAWT_XAWT_STATIC_EXCLUDE_OBJS), \
   ))
 

@@ -29,6 +29,9 @@
 #include <netdb.h>
 #include <poll.h>
 #include <sys/socket.h>
+#ifdef __QNX__
+#include <netinet/in.h>
+#endif
 
 /************************************************************************
  * Macros and constants

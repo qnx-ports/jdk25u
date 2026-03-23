@@ -867,7 +867,7 @@ bool os::print_function_and_library_name(outputStream* st,
   //  is worse than (raw) C-heap allocation in that case).
   char* p = buf;
   if (p == nullptr) {
-    p = (char*)::alloca(O_BUFLEN);
+    p = (char*)alloca(O_BUFLEN);
     buflen = O_BUFLEN;
   }
   int offset = 0;
@@ -2017,7 +2017,7 @@ static void shuffle_fisher_yates(T* arr, unsigned num, FastRandom& frand) {
 // order is: [first, last, first + 1, last - 1, ...]
 template <typename T>
 static void hemi_split(T* arr, unsigned num) {
-  T* tmp = (T*)::alloca(sizeof(T) * num);
+  T* tmp = (T*)alloca(sizeof(T) * num);
   for (unsigned i = 0; i < num; i++) {
     tmp[i] = arr[i];
   }

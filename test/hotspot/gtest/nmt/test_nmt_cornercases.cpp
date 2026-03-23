@@ -43,7 +43,7 @@ static void check_expected_malloc_header(const void* payload, MemTag mem_tag, si
 
 // Check that a malloc with an overflowing size is rejected.
 TEST_VM(NMT, malloc_failure1) {
-  void* p = os::malloc(SIZE_MAX, mtTest);
+  void* p = os::malloc(SIZE_MAX -16, mtTest);
   EXPECT_NULL(p);
 }
 
@@ -81,8 +81,8 @@ static void check_failing_realloc(size_t failing_request_size) {
 }
 
 TEST_VM(NMT, realloc_failure_overflowing_size) {
-  check_failing_realloc(SIZE_MAX);
-  check_failing_realloc(SIZE_MAX - MemTracker::overhead_per_malloc());
+  check_failing_realloc(SIZE_MAX - 16);
+  check_failing_realloc(SIZE_MAX - MemTracker::overhead_per_malloc() - 16);
 }
 
 TEST_VM(NMT, realloc_failure_gigantic_size) {

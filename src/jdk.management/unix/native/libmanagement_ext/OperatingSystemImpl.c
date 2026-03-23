@@ -47,7 +47,13 @@
 #include <sys/resource.h>
 #include <sys/times.h>
 #ifndef _ALLBSD_SOURCE
+#ifdef __QNX__
+#include <hw/sysinfo.h>
+#include <sys/debug.h>
+#include <sys/procfs.h>
+#else
 #include <sys/sysinfo.h>
+#endif
 #endif
 #include <ctype.h>
 #include <dirent.h>
@@ -63,7 +69,7 @@
 
 static jlong page_size = 0;
 
-#if defined(_ALLBSD_SOURCE) || defined(_AIX)
+#if defined(_ALLBSD_SOURCE) || defined(_AIX) || defined(__QNX__)
 #define MB      (1024UL * 1024UL)
 #else
 
@@ -120,8 +126,8 @@ Java_com_sun_management_internal_OperatingSystemImpl_initialize0
     page_size = sysconf(_SC_PAGESIZE);
 }
 
-// Linux-specific implementation is in UnixOperatingSystem.c
-#if !defined(__linux__)
+// Linux & QNX specific implementation is in UnixOperatingSystem.c
+#if !(defined(__linux__) || defined(__QNX__))
 JNIEXPORT jlong JNICALL
 Java_com_sun_management_internal_OperatingSystemImpl_getCommittedVirtualMemorySize0
   (JNIEnv *env, jobject mbean)
@@ -320,6 +326,22 @@ Java_com_sun_management_internal_OperatingSystemImpl_getOpenFileDescriptorCount0
      */
     // throw_internal_error(env, "Unimplemented in FreeBSD");
     return (100);
+#elif defined(__QNX__)
+    procfs_info info;
+        int fd = open("/proc/self/as", O_RDONLY);
+        if (fd == -1) {
+                throw_internal_error(env, "Unable to open /proc/self/as");
+                return -1;
+        }
+
+        if (devctl(fd, DCMD_PROC_INFO, &info, sizeof(info), NULL) == -1) {
+                close(fd);
+                throw_internal_error(env, "Unable get number of file descriptors");
+                return -1;
+        }
+        close(fd);
+        // subtract by 1 which was the fd open for this operation
+        return (jlong) (info.num_fdcons - 1);
 #else /* solaris/linux */
     DIR *dirp;
     struct dirent* dentp;

@@ -40,9 +40,18 @@ typedef unsigned char mincore_vec_t;
 typedef char mincore_vec_t;
 #endif
 
+#ifdef __QNX__
+#define madvise posix_madvise
+#define MADV_WILLNEED POSIX_MADV_WILLNEED
+#define MADV_DONTNEED POSIX_MADV_DONTNEED
+#endif
+
 jboolean JNICALL MappedMemoryUtils_isLoaded0(JNIEnv *env, jobject obj, jlong address,
                                              jlong len, jlong numPages)
 {
+#ifdef __QNX__
+   return JNI_TRUE;
+#else
     jboolean loaded = JNI_TRUE;
     int result = 0;
     long i = 0;
@@ -76,6 +85,7 @@ jboolean JNICALL MappedMemoryUtils_isLoaded0(JNIEnv *env, jobject obj, jlong add
     }
     free(vec);
     return loaded;
+    #endif
 }
 
 

@@ -1034,6 +1034,8 @@ class os: AllStatic {
   class Linux;
 #elif defined(_WINDOWS)
   class win32;
+#elif defined(__QNX__)
+  class Qnx;
 #endif
 
   // Ditto - Posix-specific API. Ideally should be moved to something like ::PosixUtils.

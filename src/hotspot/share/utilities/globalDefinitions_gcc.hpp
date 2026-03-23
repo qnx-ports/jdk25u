@@ -59,7 +59,7 @@
 #include <limits.h>
 #include <errno.h>
 
-#if defined(LINUX) || defined(_ALLBSD_SOURCE) || defined(_AIX)
+#if defined(LINUX) || defined(_ALLBSD_SOURCE) || defined(_AIX) || defined(__QNX__)
 #include <signal.h>
 #ifndef __OpenBSD__
 #include <ucontext.h>
@@ -74,9 +74,11 @@
 // checking for nanness
 #if defined(__APPLE__)
 inline int g_isnan(double f) { return isnan(f); }
-#elif defined(LINUX) || defined(_ALLBSD_SOURCE) || defined(_AIX)
+#elif defined(LINUX) || defined(_ALLBSD_SOURCE) || defined(_AIX) || defined(__QNX__)
 inline int g_isnan(float  f) { return isnan(f); }
 inline int g_isnan(double f) { return isnan(f); }
+#elif defined(__QNX__) || defined(_QNX_SOURCE)
+#error "QNX HERE"
 #else
 #error "missing platform-specific definition here"
 #endif

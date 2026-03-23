@@ -63,7 +63,7 @@ AC_DEFUN([FLAGS_SETUP_SHARED_LIBS],
       # Default works for linux, might work on other platforms as well.
       SHARED_LIBRARY_FLAGS='-shared'
       SET_EXECUTABLE_ORIGIN='-Wl,-rpath,\$$ORIGIN[$]1'
-      if test "x$OPENJDK_TARGET_OS" = xlinux; then
+      if test "x$OPENJDK_TARGET_OS" = xlinux ||  test "x$OPENJDK_TARGET_OS" = xqnx; then
         SET_EXECUTABLE_ORIGIN="$SET_EXECUTABLE_ORIGIN -Wl,--disable-new-dtags"
       fi
       SET_SHARED_LIBRARY_NAME='-Wl,-soname=[$]1'
@@ -681,7 +681,7 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
 
   # setup CPU bit size
   $1_DEFINES_CPU_JDK="${$1_DEFINES_CPU_JDK} -DARCH='\"$FLAGS_CPU_LEGACY\"' \
-      -D$FLAGS_CPU_LEGACY"
+      -D$FLAGS_CPU_LEGACY='$FLAGS_CPU_LEGACY'"
 
   if test "x$FLAGS_CPU_BITS" = x64; then
     $1_DEFINES_CPU_JDK="${$1_DEFINES_CPU_JDK} -D_LP64=1"
