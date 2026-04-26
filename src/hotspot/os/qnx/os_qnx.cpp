@@ -1255,33 +1255,19 @@ static void warn_fail_commit_memory(char* addr, size_t size, bool exec,
            os::errno_name(err), err);
 }
 
-// NOTE: Qnx kernel does not really reserve the pages for us.
-//       All it does is to check if there are enough free pages
-//       left at the time of mmap(). This could be a potential
-//       problem.
+// NOTE: QNX kernel always maps memory but we can't just no-op this so
+// we just use memprotect
 bool os::pd_commit_memory(char* addr, size_t size, bool exec) {
   int prot = exec ? PROT_READ|PROT_WRITE|PROT_EXEC : PROT_READ|PROT_WRITE;
-  if (exec) {
-    // Do not replace MAP_JIT mappings, see JDK-8234930
-    if (::mprotect(addr, size, prot) == 0) {
-      return true;
-    } else {
-      ErrnoPreserver ep;
-      log_trace(os, map)("mprotect failed: " RANGEFMT " errno=(%s)",
-                         RANGEFMTARGS(addr, size),
-                         os::strerror(ep.saved_errno()));
-    }
+
+    Events::log_memprotect(nullptr, "Protecting memory [" INTPTR_FORMAT "," INTPTR_FORMAT "] with protection modes %x", p2i(addr), p2i(addr+size), prot);
+  if (::mprotect(addr, size, prot) == 0) {
+    return true;
   } else {
-    uintptr_t res = (uintptr_t) ::mmap(addr, size, prot,
-                                       MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0);
-    if (res != (uintptr_t) MAP_FAILED) {
-      return true;
-    } else {
-      ErrnoPreserver ep;
-      log_trace(os, map)("mmap failed: " RANGEFMT " errno=(%s)",
-                         RANGEFMTARGS(addr, size),
-                         os::strerror(ep.saved_errno()));
-    }
+    ErrnoPreserver ep;
+    log_trace(os, map)("mprotect failed: " RANGEFMT " errno=(%s)",
+                       RANGEFMTARGS(addr, size),
+                       os::strerror(ep.saved_errno()));
   }
 
   // Warn about any commit errors we see in non-product builds just
